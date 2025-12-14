@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head><style>body { font-family: sans-serif; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid black; padding: 8px; }</style></head>
+<body>
+    <h1>Звіт про якість проекту: {{ project.name }}</h1>
+    <p>Репозиторій: {{ project.repo_url }}</p>
+    <p>Автор: {{ project.author.username }}</p>
+    <hr>
+    <h2>Деталі перевірок</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Час</th>
+                <th>Score</th>
+                <th>Complexity</th>
+                <th>Issues</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for scan in scans %}
+            <tr>
+                <td>{{ scan.timestamp }}</td>
+                <td>{{ scan.score }}</td>
+                <td>{{ scan.complexity }}</td>
+                <td>{{ scan.issues_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <p><i>Згенеровано автоматично системою QC Enterprise</i></p>
+</body>
+</html>

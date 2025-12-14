@@ -1,0 +1,14 @@
+flask
+flask-sqlalchemy
+flask-login
+flask-migrate
+flask-wtf
+email_validator
+pylint
+bandit
+radon
+gitpython
+requests
+xhtml2pdf
+pdfkit
+python-dotenv

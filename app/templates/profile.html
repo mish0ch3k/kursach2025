@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h2>Налаштування профілю</h2>
+        <hr>
+        <div class="card mb-4 border-success">
+    <div class="card-header bg-success text-white">
+        🏆 Мої досягнення
+    </div>
+    <div class="card-body">
+        {% set badges = current_user.get_achievements() %}
+        {% if badges %}
+            {% for badge in badges %}
+                <span class="badge rounded-pill bg-warning text-dark fs-6 p-2 m-1">
+                    {{ badge }}
+                </span>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">Поки що немає досягнень. Активніше працюйте над проектами!</p>
+        {% endif %}
+    </div>
+</div>
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                🤖 Підключення Telegram
+            </div>
+            <div class="card-body">
+                <p>Щоб отримувати сповіщення, дізнайтесь свій ID (наприклад, через бота @userinfobot) і впишіть його сюди.</p>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label>Ваш Telegram Chat ID</label>
+                        <input type="text" name="telegram_chat_id" class="form-control" 
+                               value="{{ current_user.telegram_chat_id if current_user.telegram_chat_id else '' }}" 
+                               placeholder="123456789">
+                    </div>
+                    <button type="submit" class="btn btn-success">Зберегти</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                ⚙️ Дані для GitHub Webhook
+            </div>
+            <div class="card-body">
+                <p>Ці налаштування є унікальними для вашого акаунту.</p>
+                
+                <div class="mb-3">
+                    <label class="fw-bold">Payload URL</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{ webhook_url }}" readonly id="urlInput">
+                        <button class="btn btn-outline-secondary" onclick="copyToClipboard('urlInput')">Copy</button>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="fw-bold">Secret (Особистий ключ)</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" value="{{ webhook_secret }}" readonly id="secretInput">
+                        <button class="btn btn-outline-secondary" onclick="copyToClipboard('secretInput')">Copy</button>
+                    </div>
+                </div>
+
+                <form method="POST" onsubmit="return confirm('Ви впевнені? Старий ключ перестане працювати на всіх проектах!');">
+                    <input type="hidden" name="regenerate_secret" value="true">
+                    <button type="submit" class="btn btn-sm btn-danger">🔄 Згенерувати новий ключ</button>
+                </form>
+            </div>
+        </div>
+
+<script>
+function copyToClipboard(id) {
+    var copyText = document.getElementById(id);
+    copyText.select();
+    navigator.clipboard.writeText(copyText.value);
+    alert("Скопійовано: " + copyText.value);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-0">{{ project.name }}</h2>
+            <span class="text-muted small"><i class="fab fa-github me-1"></i> {{ project.repo_url }}</span>
+        </div>
+        <div>
+            <a href="{{ url_for('projects.export_pdf', project_id=project.id) }}" class="btn btn-white border shadow-sm" target="_blank">
+                <i class="fas fa-file-pdf text-danger me-2"></i>Звіт PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>📈 Динаміка якості (Score)</span>
+            </div>
+        <div class="card-body">
+            <canvas id="qualityChart" width="400" height="100"></canvas>
+        </div>
+    </div>
+<div class="card mb-4">
+    <div class="card-header">
+        👥 Команда проекту
+    </div>
+    <div class="card-body d-flex align-items-center">
+        {% for member in project.members %}
+            <div class="me-3 text-center" data-bs-toggle="tooltip" title="{{ member.username }}">
+                <img src="{{ member.avatar(40) }}" class="rounded-circle border" width="40" height="40">
+                <div class="small text-muted mt-1" style="font-size: 0.75rem;">{{ member.username }}</div>
+            </div>
+        {% endfor %}
+        
+        <button class="btn btn-sm btn-outline-dashed ms-2 rounded-circle" style="width: 40px; height: 40px;" onclick="alert('Код запрошення: {{ project.invite_code }}')">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+</div>
+    <div class="card">
+        <div class="card-header">
+            📜 Історія перевірок
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Дата</th>
+                        <th>Оцінка (Score)</th>
+                        <th>Складність</th>
+                        <th>Вразливості</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for scan in scans %}
+                    <tr>
+                        <td class="ps-4 fw-bold text-muted">{{ scan.timestamp.strftime('%d.%m %H:%M') }}</td>
+                        <td>
+                            {% if scan.score >= 8 %}
+                                <span class="badge bg-success rounded-pill px-3">High: {{ scan.score }}</span>
+                            {% elif scan.score >= 5 %}
+                                <span class="badge bg-warning text-dark rounded-pill px-3">Med: {{ scan.score }}</span>
+                            {% else %}
+                                <span class="badge bg-danger rounded-pill px-3">Low: {{ scan.score }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ scan.complexity }}</td>
+                        <td>
+                            {% if scan.issues_count > 0 %}
+                                <span class="text-danger fw-bold"><i class="fas fa-bug me-1"></i>{{ scan.issues_count }}</span>
+                            {% else %}
+                                <span class="text-success"><i class="fas fa-check me-1"></i>Clean</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-light">Деталі</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var ctx = document.getElementById('qualityChart').getContext('2d');
+    
+    // Створюємо градієнт для графіка
+    var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)'); // Основний колір (прозорий)
+    gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+
+    var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels | safe }},
+            datasets: [{
+                label: 'Якість коду',
+                data: {{ data | safe }},
+                borderColor: '#4f46e5', // Indigo
+                backgroundColor: gradient,
+                borderWidth: 2,
+                pointBackgroundColor: '#ffffff',
+                pointBorderColor: '#4f46e5',
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                fill: true,
+                tension: 0.4 // Плавні лінії (криві Безьє)
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 10,
+                    grid: { borderDash: [5, 5] }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

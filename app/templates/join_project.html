@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-md-6 offset-md-3">
+    <h3>Приєднатися до проекту</h3>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Код запрошення (отримайте у адміністратора проекту)</label>
+            <input type="text" name="invite_code" class="form-control" placeholder="Наприклад: a1b2c3d4" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Приєднатися</button>
+    </form>
+</div>
+{% endblock %}

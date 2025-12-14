@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h3>Додати новий проект</h3>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Назва</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Git URL</label>
+            <input type="text" name="url" class="form-control" value="https://github.com/psf/requests.git" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Створити</button>
+    </form>
+{% endblock %}
